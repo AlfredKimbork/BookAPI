@@ -37,20 +37,31 @@ class BookGateway
   }
 
   // Get the total number of books
-  public function count(): int
+  public function count(?string $search = null): int
   {
-    $stmt = $this->pdo->query("
+    $sql = "
       SELECT COUNT(*)
       FROM books
-    ");
+    ";
+
+    if($search !== null) $sql .= "
+      WHERE books.title LIKE :search
+      OR books.description LIKE :search
+    ";
+
+    $stmt = $this->pdo->prepare($sql);
+
+    if($search !== null) $stmt->bindValue(":search", $search, PDO::PARAM_STR);
+
+    $stmt->execute();
 
     return (int) $stmt->fetchColumn();
   }
 
   // Get all books together with their author and genre
-  public function getAll(int $limit, int $offset): array
+  public function getAll(int $limit, int $offset, ?string $search = null): array
   {
-    $stmt = $this->pdo->prepare("
+    $sql = "
       SELECT
         books.id,
         books.title,
@@ -70,9 +81,21 @@ class BookGateway
 
       JOIN genres
         ON books.genre_id = genres.id
+    ";
 
+    if($search !== null) $sql .= "
+      WHERE books.title LIKE :search
+      OR books.description LIKE :search
+    ";
+
+    $sql .= "
       LIMIT :limit OFFSET :offset
-    ");
+    ";
+
+    $stmt = $this->pdo->prepare($sql);
+
+    if($search !== null) $stmt->bindValue(":search", $search, PDO::PARAM_STR);
+
 
     $stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
     $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);

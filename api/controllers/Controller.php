@@ -15,11 +15,14 @@ class Controller
       "author" => [
         "id" => $book["author_id"],
         "name" => $book["author_name"],
+        "url" => "/api/authors/" . $book["author_id"]
       ],
 
       "genre" => [
         "id" => $book["genre_id"],
         "name" => $book["genre_name"],
+        "url" => "/api/genres/" . $book["genre_id"]
+
       ],
     ];
   }

@@ -16,15 +16,19 @@ class BookController extends Controller
   {
     $page = isset($_GET["page"]) ? (int) $_GET["page"] : 1;
     $limit = isset($_GET["limit"]) ? (int) $_GET["limit"] : 10;
+    $search = isset($_GET["search"]) ? trim($_GET["search"]) : null;
 
     // Page and limit must be positive integers
     if($page < 1) ErrorHandler::badRequest("Page must be a positive integer");
     if($limit < 1) ErrorHandler::badRequest("Limit must be a positive integer");
 
+    // Empty search should behave the same as no search
+    if($search === "") $search = null;
+
     // Calculate how many books should be skipped
     $offset = ($page - 1) * $limit;
 
-    $books = $this->gateway->getAll($limit, $offset);
+    $books = $this->gateway->getAll($limit, $offset, $search);
 
     // Format every book into API response structure
     $books = array_map(
@@ -32,7 +36,7 @@ class BookController extends Controller
       $books
     );
 
-    $total = $this->gateway->count();
+    $total = $this->gateway->count($search);
 
     $pages = (int) ceil($total / $limit);
 

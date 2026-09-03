@@ -9,20 +9,30 @@ class AuthorGateway
   }
 
   // Get the total number of authors
-  public function count(): int
+  public function count(?string $search = null): int
   {
-    $stmt = $this->pdo->query("
+    $sql = "
       SELECT COUNT(*)
       FROM authors
-    ");
+    ";
+
+    if($search !== null) $sql .= "
+      WHERE authors.name LIKE :search
+    ";
+
+    $stmt = $this->pdo->prepare($sql);
+
+    if($search !== null) $stmt->bindValue(":search", $search, PDO::PARAM_STR);
+
+    $stmt->execute();
 
     return (int) $stmt->fetchColumn();
   }
 
   // Get all authors without their books
-  public function getAll(int $limit, int $offset): array
+  public function getAll(int $limit, int $offset, ?string $search = null): array
   {
-    $stmt = $this->pdo->prepare("
+    $sql = "
       SELECT
         authors.id,
         authors.name,
@@ -30,8 +40,20 @@ class AuthorGateway
         authors.death_date,
         authors.biography
       FROM authors
+    ";
+
+    if($search !== null) $sql .= "
+      WHERE authors.name LIKE :search
+    ";
+    
+    $sql .= "
       LIMIT :limit OFFSET :offset
-    ");
+    ";
+
+    $stmt = $this->pdo->prepare($sql);
+
+    if($search !== null) $stmt->bindValue(":search", $search, PDO::PARAM_STR);
+
     
     $stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
     $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
