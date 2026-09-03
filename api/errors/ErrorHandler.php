@@ -19,6 +19,28 @@ class ErrorHandler
     exit;
   }
 
+  public static function unauthorized(string $message): void
+  {
+    http_response_code(401);
+    echo json_encode([
+      "error" => "Unauthorized",
+      "message" => $message
+    ]);
+    
+    exit;
+  }
+
+  public static function forbidden(string $message): void 
+  {
+    http_response_code(403);
+    echo json_encode([
+      "error" => "Forbidden",
+      "message" => $message
+    ]);
+
+    exit;
+  }
+
   public static function notFound(string $message): void
   {
     http_response_code(404);

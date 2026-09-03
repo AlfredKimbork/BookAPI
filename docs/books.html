@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Books — Book API</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <div class="container header-content">
+
+        <a href="index.html" class="logo">
+            Book API
+        </a>
+
+        <nav>
+            <a href="index.html">Overview</a>
+            <a href="authentication.html">Authentication</a>
+            <a href="books.html" class="active">Books</a>
+            <a href="authors.html">Authors</a>
+            <a href="genres.html">Genres</a>
+        </nav>
+
+    </div>
+</header>
+
+
+<main class="container docs-page">
+
+    <div class="page-heading">
+        <p class="eyebrow">RESOURCE</p>
+        <h1>Books</h1>
+
+        <p class="lead">
+            Create, retrieve, update and delete books.
+        </p>
+    </div>
+
+
+    <section class="endpoint">
+
+        <div class="endpoint-title">
+            <span class="method get">GET</span>
+            <h2>/api/books</h2>
+        </div>
+
+        <p>
+            Returns a paginated list of books.
+        </p>
+
+        <h3>Query parameters</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td><code>page</code></td>
+                    <td>integer</td>
+                    <td>Page number. Defaults to 1.</td>
+                </tr>
+
+                <tr>
+                    <td><code>limit</code></td>
+                    <td>integer</td>
+                    <td>Results per page. Defaults to 10. Maximum 100.</td>
+                </tr>
+
+                <tr>
+                    <td><code>search</code></td>
+                    <td>string</td>
+                    <td>Searches the title and description.</td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <div class="code-block">
+            <div class="code-header">Example</div>
+
+            <pre><code>GET /api/books?page=1&amp;limit=10&amp;search=dune</code></pre>
+        </div>
+
+    </section>
+
+
+    <section class="endpoint">
+
+        <div class="endpoint-title">
+            <span class="method get">GET</span>
+            <h2>/api/books/{id}</h2>
+        </div>
+
+        <p>
+            Returns a single book by its ID.
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">Example</div>
+
+            <pre><code>GET /api/books/1</code></pre>
+        </div>
+
+    </section>
+
+
+    <section class="endpoint">
+
+        <div class="endpoint-title">
+            <span class="method post">POST</span>
+            <h2>/api/books</h2>
+        </div>
+
+        <p>
+            Creates a new book.
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">JSON</div>
+
+            <pre><code>{
+    "title": "Dune",
+    "description": "A science fiction novel.",
+    "published_year": 1965,
+    "isbn": "9780441172719",
+    "pages": 412,
+    "cover_url": "https://example.com/dune.jpg",
+    "author_id": 4,
+    "genre_id": 1
+}</code></pre>
+        </div>
+
+    </section>
+
+
+    <section class="endpoint">
+
+        <div class="endpoint-title">
+            <span class="method patch">PATCH</span>
+            <h2>/api/books/{id}</h2>
+        </div>
+
+        <p>
+            Updates an existing book. Only the fields included in the
+            request are changed.
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">JSON</div>
+
+            <pre><code>{
+    "pages": 420
+}</code></pre>
+        </div>
+
+    </section>
+
+
+    <section class="endpoint">
+
+        <div class="endpoint-title">
+            <span class="method delete">DELETE</span>
+            <h2>/api/books/{id}</h2>
+        </div>
+
+        <p>
+            Deletes a book by its ID.
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">Example</div>
+
+            <pre><code>DELETE /api/books/1</code></pre>
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer>
+    <div class="container">
+        Book API · PHP + MySQL
+    </div>
+</footer>
+
+</body>
+</html>

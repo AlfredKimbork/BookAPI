@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Authors — Book API</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <div class="container header-content">
+
+        <a href="index.html" class="logo">Book API</a>
+
+        <nav>
+            <a href="index.html">Overview</a>
+            <a href="authentication.html">Authentication</a>
+            <a href="books.html">Books</a>
+            <a href="authors.html" class="active">Authors</a>
+            <a href="genres.html">Genres</a>
+        </nav>
+
+    </div>
+</header>
+
+
+<main class="container docs-page">
+
+    <div class="page-heading">
+        <p class="eyebrow">RESOURCE</p>
+        <h1>Authors</h1>
+
+        <p class="lead">
+            Create, retrieve, update and delete authors.
+        </p>
+    </div>
+
+
+    <section class="endpoint">
+
+        <div class="endpoint-title">
+            <span class="method get">GET</span>
+            <h2>/api/authors</h2>
+        </div>
+
+        <p>
+            Returns all authors.
+        </p>
+
+        <h3>Query parameters</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td><code>search</code></td>
+                    <td>string</td>
+                    <td>
+                        Searches the author's name and biography.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </section>
+
+
+    <section class="endpoint">
+
+        <div class="endpoint-title">
+            <span class="method get">GET</span>
+            <h2>/api/authors/{id}</h2>
+        </div>
+
+        <p>
+            Returns an author and their books.
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">Example</div>
+
+            <pre><code>GET /api/authors/1</code></pre>
+        </div>
+
+    </section>
+
+
+    <section class="endpoint">
+
+        <div class="endpoint-title">
+            <span class="method post">POST</span>
+            <h2>/api/authors</h2>
+        </div>
+
+        <p>
+            Creates a new author.
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">JSON</div>
+
+            <pre><code>{
+    "name": "J.R.R. Tolkien",
+    "birth_date": "1892-01-03",
+    "death_date": "1973-09-02",
+    "biography": "English writer and academic."
+}</code></pre>
+        </div>
+
+    </section>
+
+
+    <section class="endpoint">
+
+        <div class="endpoint-title">
+            <span class="method patch">PATCH</span>
+            <h2>/api/authors/{id}</h2>
+        </div>
+
+        <p>
+            Updates an existing author.
+        </p>
+
+        <div class="code-block">
+            <div class="code-header">JSON</div>
+
+            <pre><code>{
+    "biography": "Updated biography."
+}</code></pre>
+        </div>
+
+    </section>
+
+
+    <section class="endpoint">
+
+        <div class="endpoint-title">
+            <span class="method delete">DELETE</span>
+            <h2>/api/authors/{id}</h2>
+        </div>
+
+        <p>
+            Deletes an author by ID.
+        </p>
+
+    </section>
+
+</main>
+
+
+<footer>
+    <div class="container">
+        Book API · PHP + MySQL
+    </div>
+</footer>
+
+</body>
+</html>

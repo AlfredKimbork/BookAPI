@@ -1,5 +1,7 @@
 <?php
 
+header("Content-Type: application/json");
+
 require_once __DIR__ . "/db.php";
 require_once __DIR__ . "/controllers/BookController.php";
 require_once __DIR__ . "/gateways/BookGateway.php";
@@ -7,18 +9,9 @@ require_once __DIR__ . "/controllers/AuthorController.php";
 require_once __DIR__ . "/gateways/AuthorGateway.php";
 require_once __DIR__ . "/controllers/GenreController.php";
 require_once __DIR__ . "/gateways/GenreGateway.php";
+require_once __DIR__ . "/controllers/KeyController.php";
+require_once __DIR__ . "/auth/ApiKey.php";
 require_once __DIR__ . "/errors/ErrorHandler.php";
-
-header("Content-Type: application/json");
-
-$method = $_SERVER["REQUEST_METHOD"];
-
-$path = $_GET["path"] ?? "";
-
-$parts = explode("/", trim($path, "/"));
-
-$resources = $parts[0] ?? null;
-$id = $parts[1] ?? null;
 
 $bookGateway = new BookGateway($pdo);
 $bookController = new BookController($bookGateway);
@@ -26,7 +19,28 @@ $authorGateway = new AuthorGateway($pdo);
 $authorController = new AuthorController($authorGateway);
 $genreGateway = new GenreGateway($pdo);
 $genreController = new GenreController($genreGateway);
+$keyController = new KeyController($pdo);
 
+$method = $_SERVER["REQUEST_METHOD"];
+$path = $_GET["path"] ?? "";
+$parts = explode("/", trim($path, "/"));
+
+$resources = $parts[0] ?? null;
+$id = $parts[1] ?? null;
+
+// keys is public
+if($resources === "keys") {
+  if($method === "POST" && $id === null) {
+    $keyController->create();
+    exit;
+  }
+
+  ErrorHandler::methodNotAllowed("Method not allowed for /keys");
+}
+
+$apiKey = new ApiKey($pdo);
+$key = $apiKey->authenticate();
+$apiKey->authorize($key, $method);
 
 if($resources === "books") {
   if($method === "GET" && $id === null) {
