@@ -1,33 +1,11 @@
 <?php
+require_once __DIR__ . "/Controller.php";
 require_once __DIR__ . "/../gateways/BookGateway.php";
 require_once __DIR__ . "/../errors/ErrorHandler.php";
 
-class BookController
+class BookController extends Controller
 {
   private BookGateway $gateway;
-
-  private function formatBook(array $book): array
-  {
-    return [
-      "id" => $book["id"],
-      "title" => $book["title"],
-      "description" => $book["description"],
-      "published_year" => $book["published_year"],
-      "isbn" => $book["isbn"],
-      "pages" => $book["pages"],
-      "cover_url" => $book["cover_url"],
-
-      "author" => [
-        "id" => $book["author_id"],
-        "name" => $book["author_name"],
-      ],
-
-      "genre" => [
-        "id" => $book["genre_id"],
-        "name" => $book["genre_name"],
-      ],
-    ];
-  }
 
   public function __construct(BookGateway $gateway)
   {
@@ -126,12 +104,11 @@ class BookController
       "genre_id",
     ];
 
-    foreach($data as $field => $value) {
+    foreach($data as $field => $_) {
       if(!in_array($field, $allowedFields, true)) $errors[$field] = "This field cannot be updated";
     }
 
     if(isset($data["title"]) && trim($data["title"]) === "") $errors["title"] = "Title cannot be empty";
-    if(isset($data["description"]) && trim($data["description"]) === "") $errors["description"] = "Title cannot be empty";
     if(isset($data["description"]) && trim($data["description"]) === "") $errors["description"] = "Description cannot be empty";
     if(isset($data["published_year"]) && (!is_int($data["published_year"]) || $data["published_year"] <= 0)) $errors["published_year"] = "Published year must be a positive integer";
     if(isset($data["isbn"]) && trim($data["isbn"]) === "") $errors["isbn"] = "ISBN cannot be empty";
