@@ -14,9 +14,31 @@ class GenreController extends Controller
 
   public function getAll(): void
   {
-    $genres = $this->gateway->getAll();
+    $page = isset($_GET["page"]) ? (int) $_GET["page"] : 1;
+    $limit = isset($_GET["limit"]) ? (int) $_GET["limit"] : 10;
 
-    echo json_encode($genres);
+    // Page and limit must be positive integers
+    if($page < 1) ErrorHandler::badRequest("Page must be a positive integer");
+    if($limit < 1) ErrorHandler::badRequest("Limit must be a positive integer");
+
+    // Calculate how many books should be skipped
+    $offset = ($page - 1) * $limit;
+
+    $genres = $this->gateway->getAll($limit, $offset);
+
+    $total = $this->gateway->count();
+
+    $pages = (int) ceil($total / $limit);
+
+    echo json_encode([
+      "data" => $genres,
+      "pagination" => [
+        "page" => $page,
+        "limit" => $limit,
+        "total" => $total,
+        "pages" => $pages
+      ]
+    ]);
   }
 
   public function getById(int $id): void

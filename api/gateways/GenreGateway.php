@@ -8,16 +8,33 @@ class GenreGateway
     $this->pdo = $pdo;
   }
 
-  // Get all genres without their books
-  public function getAll(): array
+  // Get the total number of genres
+  public function count(): int
   {
     $stmt = $this->pdo->query("
+      SELECT COUNT(*)
+      FROM genres
+    ");
+
+    return (int) $stmt->fetchColumn();
+  }
+
+  // Get all genres without their books
+  public function getAll(int $limit, int $offset): array
+  {
+    $stmt = $this->pdo->prepare("
       SELECT
         genres.id,
         genres.name,
         genres.description
       FROM genres
+      LIMIT :limit OFFSET :offset
     ");
+
+    $stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
+    $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
+
+    $stmt->execute();
 
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }

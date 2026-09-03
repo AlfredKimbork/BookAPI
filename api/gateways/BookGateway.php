@@ -36,10 +36,21 @@ class BookGateway
     return $stmt->fetch() !== false;
   }
 
-  // Get all books together with their author and genre
-  public function getAll(): array
+  // Get the total number of books
+  public function count(): int
   {
     $stmt = $this->pdo->query("
+      SELECT COUNT(*)
+      FROM books
+    ");
+
+    return (int) $stmt->fetchColumn();
+  }
+
+  // Get all books together with their author and genre
+  public function getAll(int $limit, int $offset): array
+  {
+    $stmt = $this->pdo->prepare("
       SELECT
         books.id,
         books.title,
@@ -59,7 +70,14 @@ class BookGateway
 
       JOIN genres
         ON books.genre_id = genres.id
+
+      LIMIT :limit OFFSET :offset
     ");
+
+    $stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
+    $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
+
+    $stmt->execute();
 
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }

@@ -8,10 +8,21 @@ class AuthorGateway
     $this->pdo = $pdo;
   }
 
-  // Get all authors without their books
-  public function getAll(): array
+  // Get the total number of authors
+  public function count(): int
   {
     $stmt = $this->pdo->query("
+      SELECT COUNT(*)
+      FROM authors
+    ");
+
+    return (int) $stmt->fetchColumn();
+  }
+
+  // Get all authors without their books
+  public function getAll(int $limit, int $offset): array
+  {
+    $stmt = $this->pdo->prepare("
       SELECT
         authors.id,
         authors.name,
@@ -19,7 +30,13 @@ class AuthorGateway
         authors.death_date,
         authors.biography
       FROM authors
+      LIMIT :limit OFFSET :offset
     ");
+    
+    $stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
+    $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
+
+    $stmt->execute();
 
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }

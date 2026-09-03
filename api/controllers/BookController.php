@@ -14,14 +14,37 @@ class BookController extends Controller
 
   public function getAll(): void
   {
-    $books = $this->gateway->getAll();
+    $page = isset($_GET["page"]) ? (int) $_GET["page"] : 1;
+    $limit = isset($_GET["limit"]) ? (int) $_GET["limit"] : 10;
 
+    // Page and limit must be positive integers
+    if($page < 1) ErrorHandler::badRequest("Page must be a positive integer");
+    if($limit < 1) ErrorHandler::badRequest("Limit must be a positive integer");
+
+    // Calculate how many books should be skipped
+    $offset = ($page - 1) * $limit;
+
+    $books = $this->gateway->getAll($limit, $offset);
+
+    // Format every book into API response structure
     $books = array_map(
       [$this, "formatBook"],
       $books
     );
 
-    echo json_encode($books);
+    $total = $this->gateway->count();
+
+    $pages = (int) ceil($total / $limit);
+
+    echo json_encode([
+      "data" => $books,
+      "pagination" => [
+        "page" => $page,
+        "limit" => $limit,
+        "total" => $total,
+        "pages" => $pages
+      ]
+    ]);
   }
 
   public function getById(int $id): void
