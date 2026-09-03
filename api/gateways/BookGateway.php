@@ -8,6 +8,7 @@ class BookGateway
     $this->pdo = $pdo;
   }
 
+  // Check whether an author exists
   public function authorExists(int $id): bool
   {
     $stmt = $this->pdo->prepare("
@@ -21,6 +22,7 @@ class BookGateway
     return $stmt->fetch() !== false;
   }
   
+  // Check whether a genre exists
   public function genreExists(int $id): bool
   {
     $stmt = $this->pdo->prepare("
@@ -34,6 +36,7 @@ class BookGateway
     return $stmt->fetch() !== false;
   }
 
+  // Get all books together with their author and genre
   public function getAll(): array
   {
     $stmt = $this->pdo->query("
@@ -61,6 +64,7 @@ class BookGateway
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
+  // Get one book together with its author and genre
   public function getById(int $id): array|false
   {
     $stmt = $this->pdo->prepare("
@@ -92,6 +96,7 @@ class BookGateway
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
+  // Create a new book and return its new ID
   public function create(array $data): int
   {
     $stmt = $this->pdo->prepare("
@@ -122,6 +127,7 @@ class BookGateway
     return (int) $this->pdo->lastInsertId();
   }
 
+  // Update only the fields allowed by the API
   public function update(int $id, array $data): array|false
   {
     $fields = [];
@@ -138,6 +144,7 @@ class BookGateway
       "genre_id",
     ];
 
+    // Build the UPDATE query from the provided fields
     foreach($data as $field => $value) {
       if(in_array($field, $allowedFields, true)) {
         $fields[] = "$field = ?";
@@ -156,13 +163,16 @@ class BookGateway
     $stmt = $this->pdo->prepare($sql);
     $stmt->execute($values);
 
+    // Return the updated book
     return $this->getById($id);
   }
 
+  // Delete a book and return its data
   public function delete(int $id): array|false
   {
     $book = $this->getById($id);
 
+    // Return false if the book does not exist
     if(!$book) return false;
 
     $stmt = $this->pdo->prepare("

@@ -23,8 +23,10 @@ class GenreController extends Controller
   {
     $genre = $this->gateway->getById($id);
 
+    // Return an error if the requested genre does not exist
     if (!$genre) ErrorHandler::notFound("Genre not found");
 
+    // Format all books belonging to the genre
     $books = [];
 
     foreach ($genre["books"] as $book) {
@@ -43,20 +45,24 @@ class GenreController extends Controller
       true
     );
 
+    // Make sure the request contains valid JSON
     if ($data === null) {
       ErrorHandler::badRequest("Request body must contain valid JSON. See the POST /genres documentation for the expected format.");
     }
 
     $errors = [];
 
+    // Validate required fields
     if (!isset($data["name"]) || trim($data["name"]) === "") $errors["name"] = "Name is required";
     if (!isset($data["description"]) || trim($data["description"]) === "") $errors["description"] = "Description is required";
     
+    // Return validation errors before creating the genre
     if (!empty($errors)) ErrorHandler::badRequest("One or more fields are invalid", $errors);
 
     try {
       $id = $this->gateway->create($data);
 
+      // Get the newly created genre so the complete object can be returned
       $genre = $this->gateway->getById($id);
 
       http_response_code(201);
@@ -73,28 +79,37 @@ class GenreController extends Controller
       true
     );
 
+    // Make sure the request contains valid JSON
     if ($data === null) ErrorHandler::badRequest("Request body must contain valid JSON. See the PATCH /genres/{id} documentation for the expected format.");
+
+    // PATCH must contain at least one field
     if (!is_array($data) || empty($data)) ErrorHandler::badRequest("Request body must contain at least one field to update.");
 
+    // Check that the genre exists before updating
     $genre = $this->gateway->getById($id);
 
     if (!$genre) ErrorHandler::notFound("Genre not found");
 
     $errors = [];
 
+    // Only these fields can be changed
     $allowedFields = [
       "name",
       "description"
     ];
 
+    // Check if the request contains fields that cannot be updated
     foreach ($data as $field => $_) {
       if (!in_array($field, $allowedFields, true)) {
         $errors[$field] = "This field cannot be updated";
       }
     }
 
+    // Validate fields if they are included in the PATCH request
     if (isset($data["name"]) && trim($data["name"]) === "") $errors["name"] = "Name cannot be empty";
     if (isset($data["description"]) && trim($data["description"]) === "") $errors["description"] = "Description cannot be empty";
+
+    // Return validation errors before updating
     if (!empty($errors)) ErrorHandler::badRequest("One or more fields are invalid", $errors);
 
     try {
@@ -129,6 +144,11 @@ class GenreController extends Controller
     } 
     
     catch (PDOException $e) {
+      // 1451 means the genre is still referenced by books
+      if ($e->errorInfo[1] === 1451) {
+        ErrorHandler::conflict("Genre cannot be deleted because it has books associated with it");
+      }
+
       ErrorHandler::serverError();
     }
   }

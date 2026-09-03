@@ -12,6 +12,14 @@ class AuthorController extends Controller
     $this->gateway = $gateway;
   }
 
+  // Checks whether a date is valid and follows the YYYY-MM-DD format exactly
+  private function validDate(string $date): bool
+  {
+    $parsed = DateTime::createFromFormat("Y-m-d", $date);
+
+    return $parsed !== false && $parsed->format("Y-m-d") === $date;
+  }
+
   public function getAll(): void
   {
     $authors = $this->gateway->getAll();
@@ -25,12 +33,9 @@ class AuthorController extends Controller
 
     if (!$author) ErrorHandler::notFound("Author not found");
 
+    // Format all books written by the author
     $books = [];
-
-    foreach ($author["books"] as $book) {
-      $books[] = $this->formatBook($book);
-    }
-
+    foreach ($author["books"] as $book) $books[] = $this->formatBook($book);
     $author["books"] = $books;
 
     echo json_encode($author);
@@ -43,28 +48,36 @@ class AuthorController extends Controller
       true
     );
 
-    if ($data === null) {
-      ErrorHandler::badRequest("Request body must contain valid JSON. See the POST /authors documentation for the expected format.");
-    }
+    // Make sure the request contains valid JSON
+    if ($data === null) ErrorHandler::badRequest("Request body must contain valid JSON. See the POST /authors documentation for the expected format.");
 
     $errors = [];
 
+    // Validate required fields
     if (!isset($data["name"]) || trim($data["name"]) === "") $errors["name"] = "Name is required";
     if (!isset($data["biography"]) || trim($data["biography"]) === "") $errors["biography"] = "Biography is required";
-    if (isset($data["birth_date"]) && !DateTime::createFromFormat("Y-m-d", $data["birth_date"])) $errors["birth_date"] = "Birth date must be a valid date in YYYY-MM-DD format";
-    if (isset($data["death_date"]) && !DateTime::createFromFormat("Y-m-d", $data["death_date"])) $errors["death_date"] = "Death date must be a valid date in YYYY-MM-DD format";
-    if (isset($data["birth_date"]) && isset($data["death_date"]) && $data["death_date"] <= $data["birth_date"]) $errors["death_date"] = "Death date must be later than birth date";
+    if (!isset($data["birth_date"]) || !$this->validDate($data["birth_date"])) $errors["birth_date"] = "Birth date must be a valid date in YYYY-MM-DD format";
 
+    // Death date is optional, but must be valid if provided
+    if (isset($data["death_date"]) && $data["death_date"] !== null && !$this->validDate($data["death_date"])) $errors["death_date"] = "Death date must be a valid date in YYYY-MM-DD format";
+
+    // Make sure the death date is after the birth date
+    if (isset($data["birth_date"]) && isset($data["death_date"]) && $data["death_date"] !== null && $data["death_date"] <= $data["birth_date"]) $errors["death_date"] = "Death date must be later than birth date";
+
+    // Return all validation errors at once
     if (!empty($errors)) ErrorHandler::badRequest("One or more fields are invalid", $errors);
 
     try {
       $id = $this->gateway->create($data);
 
+      // Get the newly created author so the complete object can be returned
       $author = $this->gateway->getById($id);
 
       http_response_code(201);
       echo json_encode($author);
-    } catch (PDOException $e) {
+    } 
+    
+    catch (PDOException $e) {
       ErrorHandler::serverError();
     }
   }
@@ -76,15 +89,20 @@ class AuthorController extends Controller
       true
     );
 
+    // Make sure the request contains valid JSON
     if ($data === null) ErrorHandler::badRequest("Request body must contain valid JSON. See the PATCH /authors/{id} documentation for the expected format.");
+
+    // PATCH must contain at least one field
     if (!is_array($data) || empty($data)) ErrorHandler::badRequest("Request body must contain at least one field to update.");
 
+    // Check that the author exists before updating
     $author = $this->gateway->getById($id);
 
     if (!$author) ErrorHandler::notFound("Author not found");
 
     $errors = [];
 
+    // Only these fields can be changed
     $allowedFields = [
       "name",
       "birth_date",
@@ -92,30 +110,33 @@ class AuthorController extends Controller
       "biography",
     ];
 
-    foreach ($data as $field => $_) {
-      if (!in_array($field, $allowedFields, true)) {
-        $errors[$field] = "This field cannot be updated";
-      }
-    }
+    // Check if the request contains fields that cannot be updated
+    foreach ($data as $field => $_) if (!in_array($field, $allowedFields, true)) $errors[$field] = "This field cannot be updated";
 
+    // Validate fields if they are included in the PATCH request
     if (isset($data["name"]) && trim($data["name"]) === "") $errors["name"] = "Name cannot be empty";
     if (isset($data["biography"]) && trim($data["biography"]) === "") $errors["biography"] = "Biography cannot be empty";
-    if (isset($data["birth_date"]) && !DateTime::createFromFormat("Y-m-d", $data["birth_date"])) $errors["birth_date"] = "Birth date must be a valid date in YYYY-MM-DD format";
-    if (isset($data["death_date"]) && !DateTime::createFromFormat("Y-m-d", $data["death_date"])) $errors["death_date"] = "Death date must be a valid date in YYYY-MM-DD format";
+    if (isset($data["birth_date"]) && !$this->validDate($data["birth_date"])) $errors["birth_date"] = "Birth date must be a valid date in YYYY-MM-DD format";
+    if (isset($data["death_date"]) && $data["death_date"] !== null && !$this->validDate($data["death_date"])) $errors["death_date"] = "Death date must be a valid date in YYYY-MM-DD format";
+
+    // Return validation errors before continuing
     if (!empty($errors)) ErrorHandler::badRequest("One or more fields are invalid", $errors);
 
-    $birthDate = $data["birth_date"] ?? $author["birth_date"];
-    $deathDate = $data["death_date"] ?? $author["death_date"];
+    // Use the new value if it was provided, otherwise use the existing value
+    // array_key_exists() is used so that "death_date": null can be handled correctly
+    $birthDate = array_key_exists("birth_date", $data) ? $data["birth_date"] : $author["birth_date"];
+    $deathDate = array_key_exists("death_date", $data) ? $data["death_date"] : $author["death_date"];
 
+    // Make sure the death date is after the birth date
     if ($deathDate !== null && $birthDate !== null && $deathDate <= $birthDate) $errors["death_date"] = "Death date must be later than birth date";
 
+    // Return date comparison errors
     if (!empty($errors)) ErrorHandler::badRequest("One or more fields are invalid",$errors);
 
     try {
       $author = $this->gateway->update($id, $data);
 
       http_response_code(200);
-
       echo json_encode($author);
     } 
     
@@ -143,6 +164,11 @@ class AuthorController extends Controller
     } 
     
     catch (PDOException $e) {
+      // 1451 means the author is still referenced by books
+      if ($e->errorInfo[1] === 1451) {
+        ErrorHandler::conflict("Author cannot be deleted because they have books associated with them");
+      }
+
       ErrorHandler::serverError();
     }
   }

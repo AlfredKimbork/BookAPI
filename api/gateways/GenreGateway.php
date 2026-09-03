@@ -8,6 +8,7 @@ class GenreGateway
     $this->pdo = $pdo;
   }
 
+  // Get all genres without their books
   public function getAll(): array
   {
     $stmt = $this->pdo->query("
@@ -21,6 +22,7 @@ class GenreGateway
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
+  // Get one genre and all books belonging to it
   public function getById(int $id): array|false
   {
     $stmt = $this->pdo->prepare("
@@ -36,8 +38,10 @@ class GenreGateway
     $stmt->execute([$id]);
     $genre = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // Return false if the genre does not exist
     if(!$genre) return false;
 
+    // Get all books belonging to the genre
     $stmt = $this->pdo->prepare("
       SELECT
         books.id,
@@ -68,6 +72,7 @@ class GenreGateway
     return $genre;
   }
 
+  // Create a new genre and return its new ID
   public function create(array $data): int
   {
     $stmt = $this->pdo->prepare("
@@ -86,6 +91,7 @@ class GenreGateway
     return (int) $this->pdo->lastInsertId();
   }
 
+  // Update only the fields allowed by the API
   public function update(int $id, array $data): array|false
   {
     $fields = [];
@@ -96,6 +102,7 @@ class GenreGateway
       "description"
     ];
 
+    // Build the UPDATE query from the provided fields
     foreach($data as $field => $value) {
       if(in_array($field, $allowedFields, true)) {
         $fields[] = "$field = ?";
@@ -114,13 +121,16 @@ class GenreGateway
     $stmt = $this->pdo->prepare($sql);
     $stmt->execute($values);
 
+    // Return the updated genre
     return $this->getById($id);
   }
 
+  // Delete a genre and return its data
   public function delete(int $id): array|false
   {
     $genre = $this->getById($id);
 
+    // Return false if the genre does not exist
     if(!$genre) return false;
 
     $stmt = $this->pdo->prepare("

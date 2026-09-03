@@ -53,6 +53,8 @@ if($resources === "books") {
     $bookController->delete((int) $id);
     exit;
   }
+
+  ErrorHandler::methodNotAllowed("Method not allowed for this endpoint");
 }
 
 if($resources === "authors") {
@@ -80,6 +82,8 @@ if($resources === "authors") {
     $authorController->delete((int) $id);
     exit;
   }
+
+  ErrorHandler::methodNotAllowed("Method not allowed for this endpoint");
 }
 
 if($resources === "genres") {
@@ -107,6 +111,8 @@ if($resources === "genres") {
     $genreController->delete((int) $id);
     exit;
   }
+
+  ErrorHandler::methodNotAllowed("Method not allowed for this endpoint");
 }
 
 

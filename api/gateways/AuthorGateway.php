@@ -8,6 +8,7 @@ class AuthorGateway
     $this->pdo = $pdo;
   }
 
+  // Get all authors without their books
   public function getAll(): array
   {
     $stmt = $this->pdo->query("
@@ -23,6 +24,7 @@ class AuthorGateway
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
+  // Get one author and all books written by them
   public function getById(int $id): array|false
   {
     $stmt = $this->pdo->prepare("
@@ -40,8 +42,10 @@ class AuthorGateway
     $stmt->execute([$id]);
     $author = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // Return false if the author does not exist
     if(!$author) return false;
 
+    // Get all books belonging to the author
     $stmt = $this->pdo->prepare("
       SELECT
         books.id,
@@ -72,6 +76,7 @@ class AuthorGateway
     return $author;
   }
 
+  // Create a new author and return their new ID
   public function create(array $data): int
   {
     $stmt = $this->pdo->prepare("
@@ -94,6 +99,7 @@ class AuthorGateway
     return (int) $this->pdo->lastInsertId();
   }
 
+  // Update only the fields allowed by the API
   public function update(int $id, array $data): array|false
   {
     $fields = [];
@@ -106,6 +112,7 @@ class AuthorGateway
       "biography",
     ];
 
+    // Build the UPDATE query from the provided fields
     foreach($data as $field => $value) {
       if(in_array($field, $allowedFields, true)) {
         $fields[] = "$field = ?";
@@ -124,13 +131,16 @@ class AuthorGateway
     $stmt = $this->pdo->prepare($sql);
     $stmt->execute($values);
 
+    // Return the updated author
     return $this->getById($id);
   }
 
+  // Delete an author and return their data
   public function delete(int $id): array|false
   {
     $author = $this->getById($id);
 
+    // Return false if the author does not exist
     if(!$author) return false;
 
     $stmt = $this->pdo->prepare("
