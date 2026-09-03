@@ -54,7 +54,7 @@ class AuthorController extends Controller
     if (isset($data["birth_date"]) && !DateTime::createFromFormat("Y-m-d", $data["birth_date"])) $errors["birth_date"] = "Birth date must be a valid date in YYYY-MM-DD format";
     if (isset($data["death_date"]) && !DateTime::createFromFormat("Y-m-d", $data["death_date"])) $errors["death_date"] = "Death date must be a valid date in YYYY-MM-DD format";
     if (isset($data["birth_date"]) && isset($data["death_date"]) && $data["death_date"] <= $data["birth_date"]) $errors["death_date"] = "Death date must be later than birth date";
-    
+
     if (!empty($errors)) ErrorHandler::badRequest("One or more fields are invalid", $errors);
 
     try {
@@ -65,9 +65,6 @@ class AuthorController extends Controller
       http_response_code(201);
       echo json_encode($author);
     } catch (PDOException $e) {
-      if ($e->errorInfo[1] === 1062) {
-        ErrorHandler::conflict("A book with this ISBN already exists");
-      }
       ErrorHandler::serverError();
     }
   }

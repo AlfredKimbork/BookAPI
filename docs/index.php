@@ -29,6 +29,11 @@
       <li><a href="#authors-post">POST Author</a></li>
       <li><a href="#authors-patch">PATCH Author</a></li>
       <li><a href="#authors-delete">DELETE Author</a></li>
+      <li><a href="#genres-get-all">GET Genres</a></li>
+      <li><a href="#genres-get-one">GET Genre</a></li>
+      <li><a href="#genres-post">POST Genre</a></li>
+      <li><a href="#genres-patch">PATCH Genre</a></li>
+      <li><a href="#genres-delete">DELETE Genre</a></li>
     </ul>
   </nav>
   <main>
@@ -607,6 +612,274 @@ Content-Type: application/json</code></pre>
         <ul>
           <li><strong>200</strong> — Author deleted successfully.</li>
           <li><strong>404</strong> — Author not found.</li>
+          <li><strong>500</strong> — Internal server error.</li>
+        </ul>
+      </div>
+    </section>
+    <section>
+      <h2>Genres</h2>
+
+      <!-- GET ALL GENRES -->
+      <div class="endpoint" id="genres-get-all">
+        <div class="endpoint-header">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/genres</span>
+        </div>
+
+        <p>Returns a list of all genres.</p>
+
+        <h4>Request</h4>
+        <pre><code>GET /api/genres</code></pre>
+
+        <h4>Response</h4>
+        <pre><code>[
+  {
+    "id": 1,
+    "name": "Fantasy",
+    "description": "Stories involving magic, mythical creatures and imaginary worlds."
+  },
+  {
+    "id": 2,
+    "name": "Science Fiction",
+    "description": "Stories involving science, technology and futuristic concepts."
+  }
+]</code></pre>
+
+        <h4>Status Codes</h4>
+        <ul>
+          <li><strong>200</strong> — Genres retrieved successfully.</li>
+        </ul>
+      </div>
+
+      <!-- GET ONE GENRE -->
+      <div class="endpoint" id="genres-get-one">
+        <div class="endpoint-header">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/genres/{id}</span>
+        </div>
+
+        <p>
+          Returns a single genre by its ID, including all books
+          belonging to that genre.
+        </p>
+
+        <h4>Request</h4>
+        <pre><code>GET /api/genres/1</code></pre>
+
+        <h4>Parameters</h4>
+        <ul>
+          <li>
+            <strong>id</strong> — The ID of the genre to retrieve.
+          </li>
+        </ul>
+
+        <h4>Response</h4>
+        <pre><code>{
+  "id": 1,
+  "name": "Fantasy",
+  "description": "Stories involving magic, mythical creatures and imaginary worlds.",
+  "books": [
+    {
+      "id": 1,
+      "title": "The Hobbit",
+      "description": "A fantasy novel about Bilbo Baggins.",
+      "published_year": 1937,
+      "isbn": "9780261102217",
+      "pages": 310,
+      "cover_url": null,
+      "author": {
+        "id": 1,
+        "name": "J.R.R. Tolkien"
+      },
+      "genre": {
+        "id": 1,
+        "name": "Fantasy"
+      }
+    }
+  ]
+}</code></pre>
+
+        <h4>Status Codes</h4>
+        <ul>
+          <li><strong>200</strong> — Genre retrieved successfully.</li>
+          <li><strong>404</strong> — Genre not found.</li>
+        </ul>
+      </div>
+
+      <!-- POST GENRE -->
+      <div class="endpoint" id="genres-post">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/genres</span>
+        </div>
+
+        <p>Creates a new genre.</p>
+
+        <h4>Request</h4>
+        <pre><code>POST /api/genres
+Content-Type: application/json</code></pre>
+
+        <h4>Request Body</h4>
+        <pre><code>{
+  "name": "Horror",
+  "description": "Stories designed to frighten, unsettle or disturb the reader."
+}</code></pre>
+
+        <h4>Fields</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Type</th>
+              <th>Required</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>name</code></td>
+              <td>string</td>
+              <td>Yes</td>
+            </tr>
+            <tr>
+              <td><code>description</code></td>
+              <td>string</td>
+              <td>Yes</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4>Response</h4>
+        <pre><code>{
+  "id": 3,
+  "name": "Horror",
+  "description": "Stories designed to frighten, unsettle or disturb the reader.",
+  "books": []
+}</code></pre>
+
+        <h4>Status Codes</h4>
+        <ul>
+          <li><strong>201</strong> — Genre created successfully.</li>
+          <li><strong>400</strong> — Invalid JSON or validation failed.</li>
+          <li><strong>500</strong> — Internal server error.</li>
+        </ul>
+      </div>
+
+      <!-- PATCH GENRE -->
+      <div class="endpoint" id="genres-patch">
+        <div class="endpoint-header">
+          <span class="method patch">PATCH</span>
+          <span class="endpoint-path">/api/genres/{id}</span>
+        </div>
+
+        <p>
+          Updates one or more fields of an existing genre.
+          Only the fields that need to be changed have to be included.
+        </p>
+
+        <h4>Request</h4>
+        <pre><code>PATCH /api/genres/1
+Content-Type: application/json</code></pre>
+
+        <pre><code>{
+  "name": "Dark Fantasy",
+  "description": "Fantasy stories with darker themes."
+}</code></pre>
+
+        <h4>Available Fields</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Type</th>
+              <th>Required</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>name</code></td>
+              <td>string</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <td><code>description</code></td>
+              <td>string</td>
+              <td>No</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>At least one field must be provided.</p>
+
+        <h4>Response</h4>
+        <pre><code>{
+  "id": 1,
+  "name": "Dark Fantasy",
+  "description": "Fantasy stories with darker themes.",
+  "books": [
+    {
+      "id": 1,
+      "title": "The Hobbit",
+      "description": "A fantasy novel about Bilbo Baggins.",
+      "published_year": 1937,
+      "isbn": "9780261102217",
+      "pages": 310,
+      "cover_url": null,
+      "author": {
+        "id": 1,
+        "name": "J.R.R. Tolkien"
+      },
+      "genre": {
+        "id": 1,
+        "name": "Dark Fantasy"
+      }
+    }
+  ]
+}</code></pre>
+
+        <h4>Status Codes</h4>
+        <ul>
+          <li><strong>200</strong> — Genre updated successfully.</li>
+          <li><strong>400</strong> — Invalid JSON or invalid fields.</li>
+          <li><strong>404</strong> — Genre not found.</li>
+          <li><strong>500</strong> — Internal server error.</li>
+        </ul>
+      </div>
+
+      <!-- DELETE GENRE -->
+      <div class="endpoint" id="genres-delete">
+        <div class="endpoint-header">
+          <span class="method delete">DELETE</span>
+          <span class="endpoint-path">/api/genres/{id}</span>
+        </div>
+
+        <p>Deletes an existing genre.</p>
+
+        <h4>Request</h4>
+        <pre><code>DELETE /api/genres/3</code></pre>
+
+        <p>
+          The genre ID is provided in the URL.
+          No request body is required.
+        </p>
+
+        <h4>Response</h4>
+        <p>
+          Returns a confirmation containing the ID and name
+          of the deleted genre.
+        </p>
+
+        <pre><code>{
+  "message": "Genre deleted successfully",
+  "deleted_genre": {
+    "id": 3,
+    "name": "Horror"
+  }
+}</code></pre>
+
+        <h4>Status Codes</h4>
+        <ul>
+          <li><strong>200</strong> — Genre deleted successfully.</li>
+          <li><strong>404</strong> — Genre not found.</li>
           <li><strong>500</strong> — Internal server error.</li>
         </ul>
       </div>
