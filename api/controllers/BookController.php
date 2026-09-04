@@ -7,6 +7,32 @@ class BookController extends Controller
 {
   private BookGateway $gateway;
 
+  private function formatBook(array $book): array
+  {
+    return [
+      "id" => $book["id"],
+      "title" => $book["title"],
+      "description" => $book["description"],
+      "published_year" => $book["published_year"],
+      "isbn" => $book["isbn"],
+      "pages" => $book["pages"],
+      "cover_url" => $book["cover_url"],
+
+      "author" => [
+        "id" => $book["author_id"],
+        "name" => $book["author_name"],
+        "url" => "/api/authors/" . $book["author_id"]
+      ],
+
+      "genre" => [
+        "id" => $book["genre_id"],
+        "name" => $book["genre_name"],
+        "url" => "/api/genres/" . $book["genre_id"]
+
+      ],
+    ];
+  }
+
   public function __construct(BookGateway $gateway)
   {
     $this->gateway = $gateway;
@@ -32,7 +58,7 @@ class BookController extends Controller
 
     // Format every book into API response structure
     $books = array_map(
-      [$this, "formatBook"],
+      [$this, "formatBooks"],
       $books
     );
 

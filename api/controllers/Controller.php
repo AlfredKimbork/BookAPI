@@ -27,29 +27,14 @@ class Controller
     exit;
   }
 
-  protected function formatBook(array $book): array
-  {
+  protected function formatBooks(array $book): array {
     return [
       "id" => $book["id"],
       "title" => $book["title"],
-      "description" => $book["description"],
-      "published_year" => $book["published_year"],
-      "isbn" => $book["isbn"],
-      "pages" => $book["pages"],
+      "author" => $book["author_name"],
+      "genre" => $book["genre_name"],
       "cover_url" => $book["cover_url"],
-
-      "author" => [
-        "id" => $book["author_id"],
-        "name" => $book["author_name"],
-        "url" => "/api/authors/" . $book["author_id"]
-      ],
-
-      "genre" => [
-        "id" => $book["genre_id"],
-        "name" => $book["genre_name"],
-        "url" => "/api/genres/" . $book["genre_id"]
-
-      ],
+      "url" => "/api/books/" . $book["id"]
     ];
   }
 }

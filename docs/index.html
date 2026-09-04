@@ -1,197 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Book API — Documentation</title>
+	<link rel="stylesheet" href="style.css">
+	<script src="script.js" defer></script>
 
-    <title>Book API — Documentation</title>
-
-    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+	<header>
+		<div class="container header-content">
+			<a href="index.html" class="logo">Book API</a>
+			<nav>
+				<a href="index.html" class="active">Overview</a>
+				<a href="authentication.html">Authentication</a>
+				<a href="books.html">Books</a>
+				<a href="authors.html">Authors</a>
+				<a href="genres.html">Genres</a>
+			</nav>
+		</div>
+	</header>
 
-<header>
-    <div class="container header-content">
+	<main class="container">
+		<section class="hero">
+			<div>
+				<p class="eyebrow">REST API</p>
+				<h1>Book API</h1>
+				<p class="lead">
+					A REST API for accessing and managing books,
+					authors and genres using HTTP and JSON.
+				</p>
+				<div class="actions">
+					<a href="authentication.html" class="button primary">
+						Get an API key
+					</a>
+					<a href="books.html" class="button">
+						Explore endpoints
+					</a>
+				</div>
+			</div>
 
-        <a href="index.html" class="logo">
-            Book API
-        </a>
+			<div class="base-url">
+				<span>Base URL</span>
+				<code>http://localhost:8888/BookAPI/api</code>
+				<button class="copy-button copy-text" data-copy="http://localhost:8888/BookAPI/api">
+					Copy
+				</button>
+			</div>
+		</section>
 
-        <nav>
-            <a href="index.html" class="active">Overview</a>
-            <a href="authentication.html">Authentication</a>
-            <a href="books.html">Books</a>
-            <a href="authors.html">Authors</a>
-            <a href="genres.html">Genres</a>
-        </nav>
+		<section>
+			<div class="section-heading">
+				<p class="eyebrow">QUICK START</p>
+				<h2>Get started</h2>
+			</div>
+			<div class="cards">
+				<article class="card">
+					<span class="card-number">01</span>
+					<h3>Generate a key</h3>
+					<p>
+						Create a read-only API key from the
+						authentication page.
+					</p>
+					<a href="authentication.html">
+						Generate a key →
+					</a>
+				</article>
 
-    </div>
-</header>
+				<article class="card">
+					<span class="card-number">02</span>
+					<h3>Authenticate</h3>
+					<p>
+						Send your key using the
+						<code>X-API-Key</code> header.
+					</p>
+				</article>
 
+				<article class="card">
+					<span class="card-number">03</span>
+					<h3>Make a request</h3>
+					<p>
+						Use GET, HEAD, POST, PATCH or DELETE
+						depending on the endpoint.
+					</p>
+				</article>
+			</div>
+		</section>
 
-<main class="container">
+		<section>
+			<div class="section-heading">
+				<p class="eyebrow">RESOURCES</p>
+				<h2>Available resources</h2>
+			</div>
+			<div class="resource-list">
+				<a href="books.html" class="resource">
+					<div>
+						<strong>Books</strong>
+						<span>
+							Books, pagination, search and CRUD operations
+						</span>
+					</div>
+					<span>→</span>
+				</a>
 
-    <section class="hero">
+				<a href="authors.html" class="resource">
+					<div>
+						<strong>Authors</strong>
+						<span>
+							Authors and their associated books
+						</span>
+					</div>
+					<span>→</span>
+				</a>
 
-        <div>
-            <p class="eyebrow">REST API</p>
+				<a href="genres.html" class="resource">
+					<div>
+						<strong>Genres</strong>
+						<span>
+							Genres and their associated books
+						</span>
+					</div>
+					<span>→</span>
+				</a>
 
-            <h1>Book API</h1>
+				<a href="authentication.html" class="resource">
+					<div>
+						<strong>API keys</strong>
+						<span>
+							Generate and authenticate API keys
+						</span>
+					</div>
+					<span>→</span>
+				</a>
+			</div>
+		</section>
 
-            <p class="lead">
-                A REST API for accessing and managing books, authors,
-                and genres.
-            </p>
+		<section>
+			<div class="section-heading">
+				<p class="eyebrow">HTTP</p>
+				<h2>Supported methods</h2>
+			</div>
+			<div class="methods">
+				<div>
+					<span class="method get">GET</span>
+					<p>Retrieve resources.</p>
+				</div>
+				<div>
+					<span class="method get">HEAD</span>
+					<p>Retrieve headers without a response body.</p>
+				</div>
+				<div>
+					<span class="method post">POST</span>
+					<p>Create resources.</p>
+				</div>
+				<div>
+					<span class="method patch">PATCH</span>
+					<p>Partially update resources.</p>
+				</div>
+				<div>
+					<span class="method delete">DELETE</span>
+					<p>Delete resources.</p>
+				</div>
+				<div>
+					<span class="method options">OPTIONS</span>
+					<p>Inspect supported methods.</p>
+				</div>
+			</div>
+		</section>
 
-            <div class="actions">
-                <a href="authentication.html" class="button primary">
-                    Get an API key
-                </a>
-
-                <a href="books.html" class="button">
-                    Explore the API
-                </a>
-            </div>
-        </div>
-
-        <div class="base-url">
-            <span>Base URL</span>
-
-            <code>/api</code>
-        </div>
-
-    </section>
-
-
-    <section>
-
-        <h2>Quick start</h2>
-
-        <div class="cards">
-
-            <article class="card">
-                <span class="card-number">01</span>
-
-                <h3>Get an API key</h3>
-
-                <p>
-                    Generate your own read-only API key from the
-                    authentication page.
-                </p>
-
-                <a href="authentication.html">
-                    Authentication →
-                </a>
-            </article>
-
-
-            <article class="card">
-                <span class="card-number">02</span>
-
-                <h3>Authenticate</h3>
-
-                <p>
-                    Include your API key in every request using the
-                    <code>X-API-Key</code> header.
-                </p>
-            </article>
-
-
-            <article class="card">
-                <span class="card-number">03</span>
-
-                <h3>Make requests</h3>
-
-                <p>
-                    Use the documented endpoints to work with books,
-                    authors, and genres.
-                </p>
-            </article>
-
-        </div>
-
-    </section>
-
-
-    <section>
-
-        <h2>Resources</h2>
-
-        <div class="resource-list">
-
-            <a href="books.html" class="resource">
-                <div>
-                    <strong>Books</strong>
-                    <span>Manage and retrieve books</span>
-                </div>
-
-                <span>→</span>
-            </a>
-
-
-            <a href="authors.html" class="resource">
-                <div>
-                    <strong>Authors</strong>
-                    <span>Manage and retrieve authors</span>
-                </div>
-
-                <span>→</span>
-            </a>
-
-
-            <a href="genres.html" class="resource">
-                <div>
-                    <strong>Genres</strong>
-                    <span>Manage and retrieve genres</span>
-                </div>
-
-                <span>→</span>
-            </a>
-
-        </div>
-
-    </section>
-
-
-    <section>
-
-        <h2>HTTP methods</h2>
-
-        <div class="methods">
-
-            <div>
-                <span class="method get">GET</span>
-                <p>Retrieve resources</p>
-            </div>
-
-            <div>
-                <span class="method post">POST</span>
-                <p>Create resources</p>
-            </div>
-
-            <div>
-                <span class="method patch">PATCH</span>
-                <p>Update resources</p>
-            </div>
-
-            <div>
-                <span class="method delete">DELETE</span>
-                <p>Delete resources</p>
-            </div>
-
-        </div>
-
-    </section>
-
-</main>
+		<section>
+			<div class="section-heading">
+				<p class="eyebrow">FORMAT</p>
+				<h2>Responses</h2>
+			</div>
+			<p>
+				The API returns JSON responses. Successful requests use
+				standard HTTP status codes such as <code>200</code>,
+				<code>201</code> and <code>204</code>.
+			</p>
+			<p>
+				Errors use a consistent structure containing an
+				<code>error</code> and usually a <code>message</code>.
+			</p>
+			<div class="code-block">
+				<div class="code-header">Example error</div>
+				<pre><code>{
+    "error": "Not Found",
+    "message": "Book not found"
+}</code></pre>
+			</div>
+		</section>
+	</main>
 
 
-<footer>
-    <div class="container">
-        Book API · PHP + MySQL
-    </div>
-</footer>
-
+	<footer>
+		<div class="container">
+			Book API · PHP + MySQL
+		</div>
+	</footer>
 </body>
 </html>

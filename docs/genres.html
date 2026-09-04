@@ -1,161 +1,450 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Genres — Book API</title>
-
-    <link rel="stylesheet" href="style.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Genres — Book API</title>
+	<link rel="stylesheet" href="style.css">
+	<script src="script.js" defer></script>
 </head>
 
 <body>
+	<header>
+		<div class="container header-content">
+			<a href="index.html" class="logo">Book API</a>
+			<nav>
+				<a href="index.html">Overview</a>
+				<a href="authentication.html">Authentication</a>
+				<a href="books.html">Books</a>
+				<a href="authors.html">Authors</a>
+				<a href="genres.html" class="active">Genres</a>
+			</nav>
+		</div>
+	</header>
 
-<header>
-    <div class="container header-content">
+	<main class="container docs-page">
+		<div class="page-heading">
+			<p class="eyebrow">RESOURCE</p>
+			<h1>Genres</h1>
+			<p class="lead">
+				Retrieve, create, update and delete genres.
+			</p>
+		</div>
 
-        <a href="index.html" class="logo">Book API</a>
+		<div class="tester-bar">
+			<label for="api-key">
+				API key
+			</label>
+			<div class="tester-key">
+				<input id="api-key" type="password" placeholder="Enter your API key">
+				<button class="button" id="save-key">
+					Save
+				</button>
+				<button class="button" id="clear-key">
+					Clear
+				</button>
+			</div>
+			<p>
+				Your key is kept in this browser session only.
+			</p>
+		</div>
 
-        <nav>
-            <a href="index.html">Overview</a>
-            <a href="authentication.html">Authentication</a>
-            <a href="books.html">Books</a>
-            <a href="authors.html">Authors</a>
-            <a href="genres.html" class="active">Genres</a>
-        </nav>
+		<!-- GET ALL -->
+		<section class="endpoint">
+			<div class="endpoint-title">
+				<span class="method get">GET</span>
+				<h2>/api/genres</h2>
+			</div>
+			<p>
+				Returns a paginated list of genres.
+			</p>
 
-    </div>
-</header>
+			<h3>Query parameters</h3>
+			<table>
+				<thead>
+					<tr>
+						<th>Parameter</th>
+						<th>Type</th>
+						<th>Required</th>
+						<th>Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><code>page</code></td>
+						<td>integer</td>
+						<td>No</td>
+						<td>Page number. Defaults to 1.</td>
+					</tr>
+					<tr>
+						<td><code>limit</code></td>
+						<td>integer</td>
+						<td>No</td>
+						<td>Results per page. Defaults to 10. Maximum 100.</td>
+					</tr>
+					<tr>
+						<td><code>search</code></td>
+						<td>string</td>
+						<td>No</td>
+						<td>Searches the genre name.</td>
+					</tr>
+				</tbody>
+			</table>
 
+			<div class="try-it">
+				<h3>Try it</h3>
+				<div class="tester-grid">
+					<input id="genres-page" type="number" min="1" value="1" placeholder="Page">
+					<input id="genres-limit" type="number" min="1" max="100" value="10" placeholder="Limit">
+					<input id="genres-search" type="text" placeholder="Search">
+					<button class="button primary" id="get-genres">
+						Send request
+					</button>
+				</div>
+				<div class="response" id="genres-response" hidden></div>
+			</div>
 
-<main class="container docs-page">
+			<div class="code-block">
+				<div class="code-header">HTTPie</div>
+				<pre><code>http GET http://localhost:8888/BookAPI/api/genres \
+X-API-Key:your-api-key \
+page==1 \
+limit==10 \
+search==fiction</code></pre>
+			</div>
 
-    <div class="page-heading">
-        <p class="eyebrow">RESOURCE</p>
-        <h1>Genres</h1>
+			<div class="code-block">
+				<div class="code-header">cURL</div>
+				<pre><code>curl "http://localhost:8888/BookAPI/api/genres?page=1&amp;limit=10&amp;search=fiction" \
+-H "X-API-Key: your-api-key"</code></pre>
+			</div>
 
-        <p class="lead">
-            Create, retrieve, update and delete genres.
-        </p>
-    </div>
-
-
-    <section class="endpoint">
-
-        <div class="endpoint-title">
-            <span class="method get">GET</span>
-            <h2>/api/genres</h2>
-        </div>
-
-        <p>
-            Returns all genres.
-        </p>
-
-        <h3>Query parameters</h3>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr>
-                    <td><code>search</code></td>
-                    <td>string</td>
-                    <td>
-                        Searches the genre name and description.
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-    </section>
-
-
-    <section class="endpoint">
-
-        <div class="endpoint-title">
-            <span class="method get">GET</span>
-            <h2>/api/genres/{id}</h2>
-        </div>
-
-        <p>
-            Returns a genre and its books.
-        </p>
-
-    </section>
-
-
-    <section class="endpoint">
-
-        <div class="endpoint-title">
-            <span class="method post">POST</span>
-            <h2>/api/genres</h2>
-        </div>
-
-        <p>
-            Creates a new genre.
-        </p>
-
-        <div class="code-block">
-            <div class="code-header">JSON</div>
-
-            <pre><code>{
-    "name": "Science Fiction",
-    "description": "Fiction based on scientific ideas."
+			<div class="code-block">
+				<div class="code-header">Response</div>
+				<pre><code>{
+	"data": [
+		{
+			"id": 1,
+			"name": "Science Fiction",
+			"description": "Fiction based on scientific ideas."
+		}
+	],
+	"pagination": {
+		"page": 1,
+		"limit": 10,
+		"total": 1,
+		"pages": 1
+	}
 }</code></pre>
-        </div>
+			</div>
+		</section>
 
-    </section>
+		<!-- HEAD -->
+		<section class="endpoint">
+			<div class="endpoint-title">
+				<span class="method get">HEAD</span>
+				<h2>/api/genres</h2>
+			</div>
+			<p>
+				Performs the same request as GET but returns no response body.
+				Useful for checking whether the endpoint is available.
+			</p>
 
+			<div class="code-block">
+				<div class="code-header">HTTPie</div>
+				<pre><code>http HEAD http://localhost:8888/BookAPI/api/genres \
+X-API-Key:your-api-key</code></pre>
+			</div>
 
-    <section class="endpoint">
+			<div class="code-block">
+				<div class="code-header">cURL</div>
+				<pre><code>curl -I http://localhost:8888/BookAPI/api/genres \
+-H "X-API-Key: your-api-key"</code></pre>
+			</div>
+		</section>
 
-        <div class="endpoint-title">
-            <span class="method patch">PATCH</span>
-            <h2>/api/genres/{id}</h2>
-        </div>
+		<!-- GET ONE -->
+		<section class="endpoint">
+			<div class="endpoint-title">
+				<span class="method get">GET</span>
+				<h2>/api/genres/{id}</h2>
+			</div>
+			<p>
+				Returns one genre by ID, including the books associated
+				with that genre.
+			</p>
 
-        <p>
-            Updates an existing genre.
-        </p>
+			<div class="try-it">
+				<h3>Try it</h3>
+				<div class="tester-grid">
+					<input id="genre-id" type="number" min="1" value="1" placeholder="Genre ID">
+					<button class="button primary" id="get-genre">
+						Send request
+					</button>
+				</div>
+				<div class="response" id="genre-response" hidden></div>
+			</div>
 
-        <div class="code-block">
-            <div class="code-header">JSON</div>
+			<div class="code-block">
+				<div class="code-header">HTTPie</div>
+				<pre><code>http GET http://localhost:8888/BookAPI/api/genres/1 \
+X-API-Key:your-api-key</code></pre>
+			</div>
 
-            <pre><code>{
-    "description": "Updated description."
+			<div class="code-block">
+				<div class="code-header">cURL</div>
+				<pre><code>curl http://localhost:8888/BookAPI/api/genres/1 \
+-H "X-API-Key: your-api-key"</code></pre>
+			</div>
+
+			<div class="code-block">
+				<div class="code-header">Response</div>
+				<pre><code>{
+	"id": 1,
+	"name": "Science Fiction",
+	"description": "Fiction based on scientific ideas.",
+	"books": [
+		{
+			"id": 1,
+			"title": "Dune",
+			"description": "A science fiction novel.",
+			"published_year": 1965,
+			"isbn": "9780441172719",
+			"pages": 412,
+			"cover_url": "https://example.com/dune.jpg",
+			"author": {
+				"id": 4,
+				"name": "Frank Herbert",
+				"url": "/api/authors/4"
+			},
+			"genre": {
+				"id": 1,
+				"name": "Science Fiction",
+				"url": "/api/genres/1"
+			}
+		}
+	]
 }</code></pre>
-        </div>
+			</div>
+		</section>
 
-    </section>
+		<!-- OPTIONS -->
+		<section class="endpoint">
+			<div class="endpoint-title">
+				<span class="method options">OPTIONS</span>
+				<h2>/api/genres</h2>
+			</div>
+			<p>
+				Returns the HTTP methods supported by this endpoint.
+			</p>
 
+			<div class="code-block">
+				<div class="code-header">HTTPie</div>
+				<pre><code>http OPTIONS http://localhost:8888/BookAPI/api/genres</code></pre>
+			</div>
 
-    <section class="endpoint">
+			<div class="code-block">
+				<div class="code-header">cURL</div>
+				<pre><code>curl -X OPTIONS -i http://localhost:8888/BookAPI/api/genres</code></pre>
+			</div>
 
-        <div class="endpoint-title">
-            <span class="method delete">DELETE</span>
-            <h2>/api/genres/{id}</h2>
-        </div>
+			<div class="code-block">
+				<div class="code-header">Response headers</div>
+				<pre><code>HTTP/1.1 204 No Content
+Allow: GET, HEAD, POST, OPTIONS</code></pre>
+			</div>
+		</section>
 
-        <p>
-            Deletes a genre by ID.
-        </p>
+		<!-- POST -->
+		<section class="endpoint">
+			<div class="endpoint-title">
+				<span class="method post">POST</span>
+				<h2>/api/genres</h2>
+			</div>
+			<p>
+				Creates a new genre. Requires write permission.
+			</p>
 
-    </section>
+			<h3>Request body</h3>
+			<table>
+				<thead>
+					<tr>
+						<th>Field</th>
+						<th>Type</th>
+						<th>Required</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><code>name</code></td>
+						<td>string</td>
+						<td>Yes</td>
+					</tr>
+					<tr>
+						<td><code>description</code></td>
+						<td>string / null</td>
+						<td>No</td>
+					</tr>
+				</tbody>
+			</table>
 
-</main>
+			<div class="code-block">
+				<div class="code-header">HTTPie</div>
+				<pre><code>http POST http://localhost:8888/BookAPI/api/genres \
+X-API-Key:your-api-key \
+Content-Type:application/json \
+name="Science Fiction" \
+description="Fiction based on scientific ideas."</code></pre>
+			</div>
 
+			<div class="code-block">
+				<div class="code-header">cURL</div>
+				<pre><code>curl -X POST http://localhost:8888/BookAPI/api/genres \
+-H "X-API-Key: your-api-key" \
+-H "Content-Type: application/json" \
+-d '{
+	"name": "Science Fiction",
+	"description": "Fiction based on scientific ideas."
+}'</code></pre>
+			</div>
 
-<footer>
-    <div class="container">
-        Book API · PHP + MySQL
-    </div>
-</footer>
+			<div class="code-block">
+				<div class="code-header">JSON</div>
+				<pre><code>{
+	"name": "Science Fiction",
+	"description": "Fiction based on scientific ideas."
+}</code></pre>
+			</div>
 
+			<div class="alert info">
+				Generated API keys are read-only, so they cannot use this endpoint.
+			</div>
+		</section>
+
+		<!-- PATCH -->
+		<section class="endpoint">
+			<div class="endpoint-title">
+				<span class="method patch">PATCH</span>
+				<h2>/api/genres/{id}</h2>
+			</div>
+			<p>
+				Partially updates an existing genre. Only supplied fields
+				are changed.
+			</p>
+
+			<div class="code-block">
+				<div class="code-header">HTTPie</div>
+				<pre><code>http PATCH http://localhost:8888/BookAPI/api/genres/1 \
+X-API-Key:your-api-key \
+Content-Type:application/json \
+description="An updated description."</code></pre>
+			</div>
+
+			<div class="code-block">
+				<div class="code-header">cURL</div>
+				<pre><code>curl -X PATCH http://localhost:8888/BookAPI/api/genres/1 \
+-H "X-API-Key: your-api-key" \
+-H "Content-Type: application/json" \
+-d '{
+	"description": "An updated description."
+}'</code></pre>
+			</div>
+
+			<div class="code-block">
+				<div class="code-header">JSON</div>
+				<pre><code>{
+	"description": "An updated description."
+}</code></pre>
+			</div>
+
+			<div class="alert info">
+				Generated API keys are read-only, so they cannot use this endpoint.
+			</div>
+		</section>
+
+		<!-- DELETE -->
+		<section class="endpoint">
+			<div class="endpoint-title">
+				<span class="method delete">DELETE</span>
+				<h2>/api/genres/{id}</h2>
+			</div>
+			<p>
+				Deletes a genre by ID.
+			</p>
+
+			<div class="code-block">
+				<div class="code-header">HTTPie</div>
+				<pre><code>http DELETE http://localhost:8888/BookAPI/api/genres/1 \
+X-API-Key:your-api-key</code></pre>
+			</div>
+			<div class="code-block">
+				<div class="code-header">cURL</div>
+				<pre><code>curl -X DELETE http://localhost:8888/BookAPI/api/genres/1 \
+-H "X-API-Key: your-api-key"</code></pre>
+			</div>
+			<div class="code-block">
+				<div class="code-header">Response</div>
+				<pre><code>{
+	"message": "Genre deleted successfully",
+	"deleted_genre": {
+		"id": 1,
+		"name": "Science Fiction"
+	}
+}</code></pre>
+			</div>
+			<div class="alert info">
+				Generated API keys are read-only, so they cannot use this endpoint.
+			</div>
+		</section>
+		<section class="doc-section">
+			<h2>Common errors</h2>
+			<table>
+				<thead>
+					<tr>
+						<th>Status</th>
+						<th>Meaning</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><code>400</code></td>
+						<td>Invalid request or field.</td>
+					</tr>
+					<tr>
+						<td><code>401</code></td>
+						<td>Missing or invalid API key.</td>
+					</tr>
+					<tr>
+						<td><code>403</code></td>
+						<td>API key lacks write permission.</td>
+					</tr>
+					<tr>
+						<td><code>404</code></td>
+						<td>Genre does not exist.</td>
+					</tr>
+					<tr>
+						<td><code>405</code></td>
+						<td>HTTP method is not supported.</td>
+					</tr>
+					<tr>
+						<td><code>415</code></td>
+						<td>Request is not sent as JSON.</td>
+					</tr>
+					<tr>
+						<td><code>409</code></td>
+						<td>Genre cannot be deleted while books reference it.</td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+	</main>
+
+	<footer>
+		<div class="container">
+			Book API · PHP + MySQL
+		</div>
+	</footer>
 </body>
+
 </html>

@@ -7,6 +7,15 @@ class AuthorController extends Controller
 {
   private AuthorGateway $gateway;
 
+  private function formatAuthors(array $author): array
+  {
+    return [
+      "id" => $author["id"],
+      "name" => $author["name"],
+      "url" => "/api/authors/" . $author["id"]
+    ];
+  }
+
   public function __construct(AuthorGateway $gateway)
   {
     $this->gateway = $gateway;
@@ -37,6 +46,10 @@ class AuthorController extends Controller
     $offset = ($page - 1) * $limit;
 
     $authors = $this->gateway->getAll($limit, $offset, $search);
+    $authors = array_map(
+      [$this, "formatAuthors"],
+      $authors
+    );
 
     $total = $this->gateway->count($search);
 
@@ -61,7 +74,7 @@ class AuthorController extends Controller
 
     // Format all books written by the author
     $books = [];
-    foreach ($author["books"] as $book) $books[] = $this->formatBook($book);
+    foreach ($author["books"] as $book) $books[] = $this->formatBooks($book);
     $author["books"] = $books;
 
     echo json_encode($author);

@@ -56,7 +56,7 @@ class GenreController extends Controller
     $books = [];
 
     foreach ($genre["books"] as $book) {
-      $books[] = $this->formatBook($book);
+      $books[] = $this->formatBooks($book);
     }
 
     $genre["books"] = $books;
