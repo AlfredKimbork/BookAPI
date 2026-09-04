@@ -51,7 +51,7 @@ class BookGateway
 
     $stmt = $this->pdo->prepare($sql);
 
-    if($search !== null) $stmt->bindValue(":search", $search, PDO::PARAM_STR);
+    if($search !== null) $stmt->bindValue(":search", "%$search%", PDO::PARAM_STR);
 
     $stmt->execute();
 
@@ -94,7 +94,7 @@ class BookGateway
 
     $stmt = $this->pdo->prepare($sql);
 
-    if($search !== null) $stmt->bindValue(":search", $search, PDO::PARAM_STR);
+    if($search !== null) $stmt->bindValue(":search", "%$search%", PDO::PARAM_STR);
 
 
     $stmt->bindValue(":limit", $limit, PDO::PARAM_INT);

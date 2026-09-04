@@ -15,10 +15,11 @@ class KeyController
       true
     );
 
-    if(!is_array($data)) ErrorHandler::badRequest("Request must be valid JSON");
+    if(json_last_error() !== JSON_ERROR_NONE) ErrorHandler::badRequest("Request body must contain valid JSON.");
+    if(!is_array($data)) ErrorHandler::badRequest("Request body must be a JSON object.");
 
     $name = trim($data["name"] ?? "");
-    if($name === "") ErrorHandler::badRequest("Name is required");
+    if($name === "" || !is_string($name)) ErrorHandler::badRequest("Name is required and must be a string");
     if(strlen($name) > 100) ErrorHandler::badRequest("Name cannot be longer than 100 characters");
 
     $apiKey = bin2hex(random_bytes(32));
@@ -32,13 +33,22 @@ class KeyController
     $stmt->bindValue(":name", $name, PDO::PARAM_STR);
     $stmt->bindValue(":key_hash", $keyHash, PDO::PARAM_STR);
 
-    $stmt->execute();
+    try {
+      $stmt->execute();
 
-    http_response_code(201);
-    echo json_encode([
-      "message" => "API key created",
-      "name" => $name,
-      "api_key" => $apiKey
-    ]);
+      http_response_code(201);
+      header("Cache-Control: no-store");
+      echo json_encode([
+        "message" => "API key created",
+        "name" => $name,
+        "api_key" => $apiKey
+      ]);
+    }
+
+    catch(PDOException $e) {
+      error_log("API key creation failed: " . $e->getMessage());
+      ErrorHandler::serverError();
+    }
+
   }
 }

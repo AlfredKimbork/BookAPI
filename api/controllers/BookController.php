@@ -62,22 +62,19 @@ class BookController extends Controller
 
   public function create(): void
   {
-    $data = json_decode(
-      file_get_contents("php://input"),
-      true
-    );
-
-    if($data === null) {
-      ErrorHandler::badRequest("Request body must contain valid JSON. See the POST /books documentation for the expected format.");
-    }
+    $data = $this->getJsonBody();
+    
+    if(json_last_error() !== JSON_ERROR_NONE) ErrorHandler::badRequest("Request body must contain valid JSON. See the PATCH /books documentation for the expected format.");
+    if(!is_array($data)) ErrorHandler::badRequest("Request body must be a JSON object. See the PATCH /books documentation for the expected format.");
 
     $errors = [];
 
-    if(!isset($data["title"]) || trim($data["title"]) === "") $errors["title"] = "Title is required";
-    if(!isset($data["description"]) || trim($data["description"]) === "") $errors["description"] = "Description is required";
+    if(!isset($data["title"]) || !is_string($data["title"]) || trim($data["title"]) === "") $errors["title"] = "Title is required and must be a string";
+    if(!isset($data["description"]) || !is_string($data["description"]) || trim($data["description"]) === "") $errors["description"] = "Description is required and must be a string";
     if(!isset($data["published_year"]) || (!is_int($data["published_year"]) || $data["published_year"] <= 0)) $errors["published_year"] = "Published year must be a positive integer";
-    if(!isset($data["isbn"]) || trim($data["isbn"]) === "") $errors["isbn"] = "ISBN is required";
+    if(!isset($data["isbn"]) || !is_string($data["isbn"]) || trim($data["isbn"]) === "") $errors["isbn"] = "ISBN is required and must be a string";
     if(!isset($data["pages"]) || (!is_int($data["pages"]) || $data["pages"] <= 0)) $errors["pages"] = "Pages must be a positive integer";
+    if(isset($data["cover_url"]) && filter_var($data["cover_url"], FILTER_VALIDATE_URL)) $errors["book_url"] = "Book URL must be a valid URL";
     if(!isset($data["author_id"]) || (!is_int($data["author_id"]) || $data["author_id"] <= 0)) $errors["author_id"] = "Author ID must be a positive integer";
     if(!isset($data["genre_id"]) || (!is_int($data["genre_id"]) || $data["genre_id"] <= 0)) $errors["genre_id"] = "Genre ID must be a positive integer";
     if(!empty($errors)) ErrorHandler::badRequest("One or more fields are invalid", $errors);
@@ -90,10 +87,11 @@ class BookController extends Controller
       $id = $this->gateway->create($data);
   
       $book = $this->gateway->getById($id);
-  
-      http_response_code(201);
-      echo json_encode(
-        $this->formatBook($book)
+
+      $this->respond(
+        $this->formatBook($book),
+        201,
+        "Location: /api/books/" . $id
       );
     }
     catch(PDOException $e) {
@@ -106,12 +104,10 @@ class BookController extends Controller
 
   public function update(int $id): void
   {
-    $data = json_decode(
-      file_get_contents("php://input"),
-      true
-    );
+    $data = $this->getJsonBody();
 
-    if($data === null) ErrorHandler::badRequest("Request body must contain valid JSON. See the PATCH /books/{id} documentation for the expected format.");
+    if(json_last_error() !== JSON_ERROR_NONE) ErrorHandler::badRequest("Request body must contain valid JSON. See the PATCH /books/{id} documentation for the expected format.");
+    if(!is_array($data)) ErrorHandler::badRequest("Request body must be a JSON object. See the PATCH /books/{id} documentation for the expected format.");
     if(!is_array($data) || empty($data)) ErrorHandler::badRequest("Request body must contain at least one field to update.");
 
     $book = $this->gateway->getById($id);
@@ -135,11 +131,12 @@ class BookController extends Controller
       if(!in_array($field, $allowedFields, true)) $errors[$field] = "This field cannot be updated";
     }
 
-    if(isset($data["title"]) && trim($data["title"]) === "") $errors["title"] = "Title cannot be empty";
-    if(isset($data["description"]) && trim($data["description"]) === "") $errors["description"] = "Description cannot be empty";
+    if(isset($data["title"]) && !is_string($data["title"]) && trim($data["title"]) === "") $errors["title"] = "Title cannot be empty";
+    if(isset($data["description"]) && !is_string($data["description"]) && trim($data["description"]) === "") $errors["description"] = "Description cannot be empty";
     if(isset($data["published_year"]) && (!is_int($data["published_year"]) || $data["published_year"] <= 0)) $errors["published_year"] = "Published year must be a positive integer";
-    if(isset($data["isbn"]) && trim($data["isbn"]) === "") $errors["isbn"] = "ISBN cannot be empty";
+    if(isset($data["isbn"]) && !is_string($data["isbn"]) && trim($data["isbn"]) === "") $errors["isbn"] = "ISBN cannot be empty";
     if(isset($data["pages"]) && (!is_int($data["pages"]) || $data["pages"] <= 0)) $errors["pages"] = "Pages must be a positive integer";
+    if(isset($data["cover_url"]) && filter_var($data["cover_url"], FILTER_VALIDATE_URL)) $errors["book_url"] = "Book URL must be a valid URL";
     if(isset($data["author_id"]) && (!is_int($data["author_id"]) || $data["author_id"] <= 0)) $errors["author_id"] = "Author ID must be a positive integer";
     if(isset($data["genre_id"]) && (!is_int($data["genre_id"]) || $data["genre_id"] <= 0)) $errors["genre_id"] = "Genre ID must be a positive integer";
     if(!empty($errors)) ErrorHandler::badRequest("One or more fields are invalid", $errors);
@@ -151,8 +148,7 @@ class BookController extends Controller
     try {
       $book = $this->gateway->update($id, $data);
 
-      http_response_code(200);
-      echo json_encode(
+      $this->respond(
         $this->formatBook($book)
       );
     }
@@ -172,8 +168,7 @@ class BookController extends Controller
 
       if(!$book) ErrorHandler::notFound("Book not found");
 
-      http_response_code(200);
-      echo json_encode([
+      $this->respond([
         "message" => "Book deleted successfully",
         "deleted_book" => [
           "id" => $book["id"],

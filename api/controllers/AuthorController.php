@@ -69,13 +69,11 @@ class AuthorController extends Controller
 
   public function create(): void
   {
-    $data = json_decode(
-      file_get_contents("php://input"),
-      true
-    );
+    $data = $this->getJsonBody();
 
     // Make sure the request contains valid JSON
-    if ($data === null) ErrorHandler::badRequest("Request body must contain valid JSON. See the POST /authors documentation for the expected format.");
+    if(json_last_error() !== JSON_ERROR_NONE) ErrorHandler::badRequest("Request body must contain valid JSON. See the PATCH /authors documentation for the expected format.");
+    if(!is_array($data)) ErrorHandler::badRequest("Request body must be a JSON object. See the PATCH /authors documentation for the expected format.");
 
     $errors = [];
 
@@ -98,9 +96,9 @@ class AuthorController extends Controller
 
       // Get the newly created author so the complete object can be returned
       $author = $this->gateway->getById($id);
+      $this->respond($author, 201, "Location: /api/authors/" . $id);
 
-      http_response_code(201);
-      echo json_encode($author);
+      exit;
     } 
     
     catch (PDOException $e) {
@@ -110,13 +108,11 @@ class AuthorController extends Controller
 
   public function update(int $id): void
   {
-    $data = json_decode(
-      file_get_contents("php://input"),
-      true
-    );
+    $data = $this->getJsonBody();
 
     // Make sure the request contains valid JSON
-    if ($data === null) ErrorHandler::badRequest("Request body must contain valid JSON. See the PATCH /authors/{id} documentation for the expected format.");
+    if(json_last_error() !== JSON_ERROR_NONE) ErrorHandler::badRequest("Request body must contain valid JSON. See the PATCH /authors/{id} documentation for the expected format.");
+    if(!is_array($data)) ErrorHandler::badRequest("Request body must be a JSON object. See the PATCH /authors/{id} documentation for the expected format.");
 
     // PATCH must contain at least one field
     if (!is_array($data) || empty($data)) ErrorHandler::badRequest("Request body must contain at least one field to update.");
@@ -161,9 +157,10 @@ class AuthorController extends Controller
 
     try {
       $author = $this->gateway->update($id, $data);
+      $this->respond($author);
 
-      http_response_code(200);
-      echo json_encode($author);
+      exit;
+
     } 
     
     catch (PDOException $e) {
@@ -177,15 +174,14 @@ class AuthorController extends Controller
       $author = $this->gateway->delete($id);
 
       if (!$author) ErrorHandler::notFound("Author not found");
-
-      http_response_code(200);
-      echo json_encode([
+      $this->respond([
         "message" => "Author deleted successfully",
         "deleted_author" => [
           "id" => $author["id"],
           "name" => $author["name"],
-        ],
+        ]
       ]);
+
       exit;
     } 
     

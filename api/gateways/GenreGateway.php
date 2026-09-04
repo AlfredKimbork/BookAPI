@@ -19,14 +19,12 @@ class GenreGateway
     if($search !== null) $sql .= "
       WHERE genres.name LIKE :search
     ";
-    
-    $sql .= "
-      LIMIT :limit OFFSET :offset
-    ";
 
     $stmt = $this->pdo->prepare($sql);
 
-    if($search !== null) $stmt->bindValue(":search", $search, PDO::PARAM_STR);
+    if($search !== null) $stmt->bindValue(":search", "%$search%", PDO::PARAM_STR);
+
+    $stmt->execute();
 
     return (int) $stmt->fetchColumn();
   }
@@ -52,7 +50,7 @@ class GenreGateway
 
     $stmt = $this->pdo->prepare($sql);
 
-    if($search !== null) $stmt->bindValue(":search", $search, PDO::PARAM_STR);
+    if($search !== null) $stmt->bindValue(":search", "%$search%", PDO::PARAM_STR);
 
     $stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
     $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);

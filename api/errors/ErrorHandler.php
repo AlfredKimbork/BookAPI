@@ -1,6 +1,14 @@
 <?php
 class ErrorHandler
 {
+  public static function options(string $methods): void
+  {
+    http_response_code(204);
+    header("Allow: " . $methods);
+
+    exit;
+  }
+
   public static function badRequest(string $message, array $fields = []): void
   {
     http_response_code(400);
@@ -45,18 +53,21 @@ class ErrorHandler
   {
     http_response_code(404);
     echo json_encode([
-      "error" => $message,
+      "error" => "Not found",
+      "message" => $message
     ]);
 
     exit;
   }
 
-  public static function methodNotAllowed(string $message): void
+  public static function methodNotAllowed(string $message, string $allowedMethods = ""): void
   {
     http_response_code(405);
+    if(!empty($allowedMethods)) header("Allow: " . $allowedMethods);
+
     echo json_encode([
       "error" => "Method not allowed",
-      "message" => $message,
+      "message" => $message
     ]);
 
     exit;
@@ -68,6 +79,17 @@ class ErrorHandler
     http_response_code(409);
     echo json_encode([
       "error" => "Conflict",
+      "message" => $message
+    ]);
+
+    exit;
+  }
+
+  public static function unsupportedMediaType(string $message): void
+  {
+    http_response_code(415);
+    echo json_encode([
+      "error" => "Unsupported Media Type",
       "message" => $message
     ]);
 

@@ -34,7 +34,7 @@ class ApiKey
 
   public function authorize(array $key, string $method): void
   {
-    $readMethod = ["GET"];
+    $readMethod = ["GET", "HEAD"];
     $writeMethod = ["POST", "PATCH", "DELETE"];
 
     if(in_array($method, $readMethod) && !$key["can_read"]) ErrorHandler::forbidden("This API key does not have read permissions");

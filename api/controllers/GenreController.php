@@ -66,15 +66,11 @@ class GenreController extends Controller
 
   public function create(): void
   {
-    $data = json_decode(
-      file_get_contents("php://input"),
-      true
-    );
+    $data = $this->getJsonBody();
 
     // Make sure the request contains valid JSON
-    if ($data === null) {
-      ErrorHandler::badRequest("Request body must contain valid JSON. See the POST /genres documentation for the expected format.");
-    }
+    if(json_last_error() !== JSON_ERROR_NONE) ErrorHandler::badRequest("Request body must contain valid JSON. See the PATCH /genres documentation for the expected format.");
+    if(!is_array($data)) ErrorHandler::badRequest("Request body must be a JSON object. See the PATCH /genres documentation for the expected format.");
 
     $errors = [];
 
@@ -90,23 +86,23 @@ class GenreController extends Controller
 
       // Get the newly created genre so the complete object can be returned
       $genre = $this->gateway->getById($id);
-
-      http_response_code(201);
-      echo json_encode($genre);
-    } catch (PDOException $e) {
+      $this->respond($genre, 201, "Location: /api/authors/" . $id);
+      
+      exit;
+    } 
+    
+    catch (PDOException $e) {
       ErrorHandler::serverError();
     }
   }
 
   public function update(int $id): void
   {
-    $data = json_decode(
-      file_get_contents("php://input"),
-      true
-    );
+    $data = $this->getJsonBody();
 
     // Make sure the request contains valid JSON
-    if ($data === null) ErrorHandler::badRequest("Request body must contain valid JSON. See the PATCH /genres/{id} documentation for the expected format.");
+    if(json_last_error() !== JSON_ERROR_NONE) ErrorHandler::badRequest("Request body must contain valid JSON. See the PATCH /genres/{id} documentation for the expected format.");
+    if(!is_array($data)) ErrorHandler::badRequest("Request body must be a JSON object. See the PATCH /genres/{id} documentation for the expected format.");
 
     // PATCH must contain at least one field
     if (!is_array($data) || empty($data)) ErrorHandler::badRequest("Request body must contain at least one field to update.");
@@ -140,10 +136,9 @@ class GenreController extends Controller
 
     try {
       $genre = $this->gateway->update($id, $data);
+      $this->respond($genre);
 
-      http_response_code(200);
-
-      echo json_encode($genre);
+      exit;
     } 
     
     catch (PDOException $e) {
@@ -157,15 +152,14 @@ class GenreController extends Controller
       $genre = $this->gateway->delete($id);
 
       if (!$genre) ErrorHandler::notFound("Genre not found");
-
-      http_response_code(200);
-      echo json_encode([
+      $this->respond([
         "message" => "Genre deleted successfully",
         "deleted_genre" => [
           "id" => $genre["id"],
           "name" => $genre["name"],
         ],
       ]);
+
       exit;
     } 
     
