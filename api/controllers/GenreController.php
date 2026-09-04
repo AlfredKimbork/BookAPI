@@ -34,7 +34,7 @@ class GenreController extends Controller
 
     $pages = (int) ceil($total / $limit);
 
-    echo json_encode([
+    $this->respond([
       "data" => $genres,
       "pagination" => [
         "page" => $page,
@@ -61,7 +61,7 @@ class GenreController extends Controller
 
     $genre["books"] = $books;
 
-    echo json_encode($genre);
+    $this->respond($genre);
   }
 
   public function create(): void
@@ -92,6 +92,7 @@ class GenreController extends Controller
     } 
     
     catch (PDOException $e) {
+      error_log("Genre creation failed: " . $e->getMessage());
       ErrorHandler::serverError();
     }
   }
@@ -142,6 +143,7 @@ class GenreController extends Controller
     } 
     
     catch (PDOException $e) {
+      error_log("Genre update failed: " . $e->getMessage());
       ErrorHandler::serverError();
     }
   }
@@ -168,7 +170,7 @@ class GenreController extends Controller
       if ($e->errorInfo[1] === 1451) {
         ErrorHandler::conflict("Genre cannot be deleted because it has books associated with it");
       }
-
+      error_log("Genre deletion failed: " . $e->getMessage());
       ErrorHandler::serverError();
     }
   }

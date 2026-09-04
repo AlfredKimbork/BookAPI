@@ -47,6 +47,7 @@ if (keyForm) {
     keyResult.hidden = true;
 
     const name = keyName.value.trim();
+    const canWrite = document.querySelector("#can-write").checked;
 
     if (!name) {
       showKeyError("Name is required.");
@@ -63,6 +64,7 @@ if (keyForm) {
 
         body: JSON.stringify({
           name: name,
+          can_write: false
         }),
       });
 

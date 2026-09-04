@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Authentication — Book API</title>
   <link rel="stylesheet" href="style.css">
-	<script src="script.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
+
 <body>
   <header>
     <div class="container header-content">
@@ -44,13 +46,25 @@
         <p class="input-help">
           Maximum 100 characters.
         </p>
+        <div class="write-permission">
+          <div class="write-permission-info">
+            <label for="can-write">
+              Write permission
+            </label>
+            <p>
+              Allows creating, updating and deleting resources.
+            </p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="can-write" name="can_write">
+            <span class="switch-slider"></span>
+          </label>
+        </div>
         <button type="submit" class="button primary">
           Generate API key
         </button>
       </form>
-
       <div id="key-error" class="alert error" hidden></div>
-
       <div id="key-result" class="key-result" hidden>
         <div class="alert warning">
           <strong>Save this key now.</strong>
@@ -191,4 +205,5 @@ name="My application"</code></pre>
     </div>
   </footer>
 </body>
+
 </html>

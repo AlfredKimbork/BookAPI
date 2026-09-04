@@ -66,7 +66,7 @@ class BookController extends Controller
 
     $pages = (int) ceil($total / $limit);
 
-    echo json_encode([
+    $this->respond([
       "data" => $books,
       "pagination" => [
         "page" => $page,
@@ -83,7 +83,7 @@ class BookController extends Controller
 
     if (!$book) ErrorHandler::notFound("Book not found");
 
-    echo json_encode($this->formatBook($book));
+    $this->respond($this->formatBook($book));
   }
 
   public function create(): void
@@ -124,6 +124,7 @@ class BookController extends Controller
       if($e->errorInfo[1] === 1062){
         ErrorHandler::conflict("A book with this ISBN already exists");
       }
+      error_log("Book creation failed: " . $e->getMessage());
       ErrorHandler::serverError();
     }
   }
@@ -183,6 +184,7 @@ class BookController extends Controller
       if($e->errorInfo[1] === 1062){
         ErrorHandler::conflict("A book with this ISBN already exists");
       }
+      error_log("Book update failed: " . $e->getMessage());
       ErrorHandler::serverError();
     }
   }
@@ -199,13 +201,14 @@ class BookController extends Controller
         "deleted_book" => [
           "id" => $book["id"],
           "title" => $book["title"],
-        ],
+        ]
       ]);
 
       exit;
     }
 
     catch(PDOException $e) {
+      error_log("Book deletion failed: " . $e->getMessage());
       ErrorHandler::serverError();
     }
   }

@@ -55,7 +55,7 @@ class AuthorController extends Controller
 
     $pages = (int) ceil($total / $limit);
 
-    echo json_encode([
+    $this->respond([
       "data" => $authors,
       "pagination" => [
         "page" => $page,
@@ -77,7 +77,7 @@ class AuthorController extends Controller
     foreach ($author["books"] as $book) $books[] = $this->formatBooks($book);
     $author["books"] = $books;
 
-    echo json_encode($author);
+    $this->respond($author);
   }
 
   public function create(): void
@@ -115,6 +115,7 @@ class AuthorController extends Controller
     } 
     
     catch (PDOException $e) {
+      error_log("author creation failed: " . $e->getMessage());
       ErrorHandler::serverError();
     }
   }
@@ -177,6 +178,7 @@ class AuthorController extends Controller
     } 
     
     catch (PDOException $e) {
+      error_log("author update failed: " . $e->getMessage());
       ErrorHandler::serverError();
     }
   }
@@ -203,7 +205,7 @@ class AuthorController extends Controller
       if ($e->errorInfo[1] === 1451) {
         ErrorHandler::conflict("Author cannot be deleted because they have books associated with them");
       }
-
+      error_log("author deletion failed: " . $e->getMessage());
       ErrorHandler::serverError();
     }
   }
